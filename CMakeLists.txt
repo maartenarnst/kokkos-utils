@@ -20,10 +20,16 @@ project(
 option(KOKKOSUTILS_ENABLE_TESTS "Enable testing" ON)
 option(KOKKOSUTILS_ENABLE_DOC   "Enable documentation" ON)
 
+#---- Global property that helps us keep track of files that will automatically be added
+#     to our Doxygen documentation.
+define_property(GLOBAL PROPERTY FILES_FOR_DOC 
+    BRIEF_DOCS "Files that will be added to the Doxygen documentation."
+)
+
 #---- Find Kokkos.
 #
 # Currently, we require the Kokkos::kokkoscore target. Other targets will be added as needed.
-if(NOT TARGET Kokkos::kokkoscore)
+if(NOT TARGET Kokkos::kokkoscore OR NOT T)
     find_package(
         Kokkos
         ${KOKKOS_VERSION}
@@ -50,11 +56,6 @@ if(NOT TARGET GTest::gtest_main)
     message(FATAL_ERROR "Googletest should define a GTest::gtest_main target.")
 endif()
 
-#---- Documentation.
-if(KOKKOSUTILS_ENABLE_DOC)
-    add_subdirectory(docs)
-endif()
-
 #---- Build the Kokkos::utils library.
 add_library(KokkosUtils INTERFACE)
 add_library(Kokkos::utils ALIAS KokkosUtils)
@@ -62,10 +63,11 @@ add_library(Kokkos::utils ALIAS KokkosUtils)
 target_sources(
     KokkosUtils
     INTERFACE
-        FILE_SET concepts
-        TYPE HEADERS
-        BASE_DIRS include/kokkos-utils
-        FILES include/kokkos-utils/concepts/View.hpp
+        #FILE_SET concepts
+        #TYPE HEADERS
+        #BASE_DIRS include/kokkos-utils
+        #FILES 
+            include/kokkos-utils/concepts/View.hpp
 )
 
 target_include_directories(
@@ -90,4 +92,9 @@ target_compile_definitions(
 if(KOKKOSUTILS_ENABLE_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+#---- Documentation.
+if(KOKKOSUTILS_ENABLE_DOC)
+    add_subdirectory(docs)
 endif()
