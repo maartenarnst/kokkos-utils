@@ -15,7 +15,7 @@ function(add_one_test)
     cmake_path(ABSOLUTE_PATH SOURCE_FILE)
 
     # Add source file to the documentation list.
-    set_property(GLOBAL APPEND PROPERTY FILES_FOR_DOC ${SOURCE_FILE})
+    set_property(GLOBAL APPEND PROPERTY KokkosUtils_FILES_FOR_DOC ${SOURCE_FILE})
 
     # Create test executable.
     add_executable(${EXECUTABLE_NAME})

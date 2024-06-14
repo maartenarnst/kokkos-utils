@@ -2,9 +2,13 @@
 if(NOT TARGET Doxygen::doxygen)
     find_package(
         Doxygen
-        ${DOXYGEN_VERSION}
+        ${Doxygen_REQUIRED_VERSION}
         REQUIRED
     )
+else()
+    if(NOT Doxygen_VERSION VERSION_GREATER_EQUAL Doxygen_REQUIRED_VERSION)
+        message(FATAL_ERROR "Doxygen version should be at least ${Doxygen_REQUIRED_VERSION}.")
+    endif()
 endif()
 
 #---- Our 'homepage' is the README file.
@@ -18,8 +22,8 @@ set(DOXYGEN_SOURCE_BROWSER YES)
 set(DOXYGEN_WARN_IF_UNDOCUMENTED NO)
 
 #---- Extract files for documentation.
-get_target_property(KokkosUtils_FILES_FOR_DOC KokkosUtils INTERFACE_SOURCES)
-get_property(FILES_FOR_DOC GLOBAL PROPERTY FILES_FOR_DOC)
+get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC KokkosUtils INTERFACE_SOURCES)
+get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
 #---- Add Doxygen as a target.
 #     See also https://cmake.org/cmake/help/latest/module/FindDoxygen.html.
@@ -29,12 +33,12 @@ doxygen_add_docs(
     # Homepage
     ${HOMEPAGE_MD}
 
-    # Headers from KokkosUtils library
+    # Headers from our KokkosUtils library target
+    ${KokkosUtils_TARGET_FILES_FOR_DOC}
+
+    # Files added to the global property KokkosUtils_FILES_FOR_DOC
     ${KokkosUtils_FILES_FOR_DOC}
 
-    # Files added to the global property FILES_FOR_DOC
-    ${FILES_FOR_DOC}
-
-    # Files NOT added to the global property FILES_FOR_DOC
+    # Files NOT added to the global property KokkosUtils_FILES_FOR_DOC
     ${CMAKE_SOURCE_DIR}/docs/tests.dox
 )
